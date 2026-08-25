@@ -1,0 +1,13 @@
+
+> frontend@0.0.0 test
+> vitest run
+
+
+ RUN  v4.1.10 /home/em/code/finished/lifelogr/frontend
+
+
+ Test Files  3 passed (3)
+      Tests  21 passed (21)
+   Start at  20:04:06
+   Duration  499ms (transform 91ms, setup 0ms, import 146ms, tests 18ms, environment 858ms)
+
