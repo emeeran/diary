@@ -406,6 +406,7 @@ Response shape: `{ items: [...], total: int, offset: int, limit: int }`
 | Method | Path | Summary |
 |--------|------|---------|
 | POST | `/api/v1/media` | Upload media file |
+| POST | `/api/v1/media/from-path` | Import a local file by absolute path (Tauri drag-drop; home+tmp sandbox) |
 | GET | `/api/v1/media/{media_id}` | Get media metadata |
 | GET | `/api/v1/media/{media_id}/file` | Download media file |
 | DELETE | `/api/v1/media/{media_id}` | Delete media |
@@ -417,6 +418,13 @@ Response shape: `{ items: [...], total: int, offset: int, limit: int }`
   - 400 Bad Request — file exceeds 25 MB
   - 404 Not Found — `entry_id` does not exist
   - 422 — validation failure
+
+#### `POST /api/v1/media/from-path`
+- **Request:** `MediaFromPath` — `entry_id`, absolute `path`, optional `caption`
+- **Response:** `MediaResponse` — 201 Created
+- **Sandbox:** path must resolve under the user's home dir or system temp;
+  the app data dir, `~/.ssh`, `~/.gnupg`, `~/.config` are denied
+- **Errors:** 400 (outside sandbox / denied location / unknown extension / blocked signature), 404 (file or entry missing)
 
 #### `GET /api/v1/media/{media_id}`
 - **Response:** `MediaResponse` — 200 OK
@@ -674,6 +682,11 @@ class PromptService:
 | `GET /media/{id}/file` | FR-014 | MUST |
 | `DELETE /media/{id}` | FR-015 | MUST |
 | `EntryService.soft_delete` → `MediaService.delete_by_entry` | FR-016 | MUST |
+| `POST /media/from-path`, home+tmp import sandbox | FR-013 | MUST |
+| Journal date display standard dd-mm-yyyy (storage stays ISO) | NFR-008 | MUST |
+| Calendar single-click opens the date's editor (pre-filled for new dates) | FR-004 | MUST |
+| Journal inline media embed (image/video/audio) + resizable preview + per-image OCR inserted below the image | FR-013, FR-005 | MUST |
+| Deprecated AI model fixups (`_DEPRECATED_MODEL_FIXUPS`, startup rewrite) | NFR-005 | MUST |
 | `POST /recordings`, audio upload | FR-017 | MUST |
 | `POST /recordings/{id}/transcribe`, local STT | FR-018 | MUST |
 | `POST /backup/config`, encrypted credentials | FR-019 | MUST |
