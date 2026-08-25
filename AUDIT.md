@@ -83,6 +83,44 @@ committed).
   thin (sidecar + window); accepted.
 - **Emoji in OAuth success pages** — established human tone, kept.
 
+## Missed by pipeline, caught by blind review
+
+(An independent, context-blind reviewer — see `.pipeline/blind-review.md` —
+found these after Phases 1–4; they are genuine pipeline misses, recorded here
+rather than quietly patched.)
+
+- [ ] high `routers/media.py:65` — the **batch** upload endpoint repeats the
+  whole-file `file.read()` in a loop, compounding the OOM blocker. The audit
+  had caught the single-upload and recordings paths; it missed the batch one.
+- [ ] medium `services/media_service.py:158-186` vs
+  `services/note_media_service.py:141-164` — the from-path sandbox exists as
+  two ~25-line copy-pasted implementations drifting independently. This is
+  exactly the duplication Phase 2 was supposed to find, and didn't. One
+  shared, unit-tested helper is the fix.
+- [ ] medium the from-path sandbox blocklist misses `~/.aws`, `~/.kube`,
+  `~/.netrc`, `~/.docker`, `~/.var/app` (Flatpak) — blocklist-vs-moving-target
+  problem. Consider inverting to an explicit allowlist of media file
+  extensions + size cap before `read_bytes()`.
+- [ ] low `config.py:16` — `_default_data_dir` docstring references dead
+  `DIARIUM_DATA_DIR` env var; `.gitignore` still lists `*.diary`. Naming
+  residue from the app's pre-LifeLogr identity.
+- [ ] low `main.py:201-242` — rate limiter never fires in the supported
+  deployment (disabled unless production env, pointless on loopback). ~40
+  dead lines; either delete or document as server-only.
+- [ ] low stale `.pyc` files for ~25 deleted modules (email_service,
+  contacts_sync, planner_service…) sit in `__pycache__` on disk — untracked,
+  but `make clean` should sweep them.
+
+Both agree on (higher confidence): the OOM upload pattern as a blocker,
+fire-and-forget task handling, frontend test gap, SECRET_KEY/APP_ENV default
+risk, OAuth-secret rotation as hygiene.
+
+Disagreement (surfaced, not resolved): the blind reviewer asked "where is
+`validate_production()` even called?" — verified answer: `database.py:366`,
+gated on `is_production and not sidecar`. The reviewer missed the call site
+but the substance (opt-in gating) stands; the High finding above is correct
+as written.
+
 ## Verification status
 
 - Test baseline: 423 backend + 21 frontend passing (Phase 0, re-verified
@@ -90,3 +128,5 @@ committed).
 - Claims in this audit were spot-checked in the main thread: `.env` git status,
   upload size-check location, CI test invocation, REDIRECT_URI hardcoding,
   `validate_production()` gating — all confirmed as stated above.
+- The blind reviewer independently ran the backend suite: 423 passed,
+  matching.
