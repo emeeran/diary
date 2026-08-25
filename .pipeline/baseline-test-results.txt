@@ -1,0 +1,23 @@
+........................................................................ [ 17%]
+........................................................................ [ 34%]
+........................................................................ [ 51%]
+........................................................................ [ 68%]
+........................................................................ [ 85%]
+...............................................................          [100%]/home/em/code/finished/lifelogr/backend/.venv/lib/python3.11/site-packages/_pytest/unraisableexception.py:33: RuntimeWarning: coroutine 'AsyncMockMixin._execute_mock_call' was never awaited
+  gc.collect()
+RuntimeWarning: Enable tracemalloc to get the object allocation traceback
+
+423 passed in 162.41s (0:02:42)
+
+> frontend@0.0.0 test
+> vitest run
+
+
+ RUN  v4.1.10 /home/em/code/finished/lifelogr/frontend
+
+
+ Test Files  3 passed (3)
+      Tests  21 passed (21)
+   Start at  20:04:06
+   Duration  499ms (transform 91ms, setup 0ms, import 146ms, tests 18ms, environment 858ms)
+
